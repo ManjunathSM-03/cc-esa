@@ -1,0 +1,35 @@
+services:
+  # Backend Service
+  - type: web
+    name: smart-campus-backend
+    env: node
+    root: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+  # Frontend Service
+  - type: static
+    name: smart-campus-frontend
+    env: static
+    root: frontend
+    plan: free
+    buildCommand: npm run build
+    publish: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: smart-campus-backend
+          property: url
